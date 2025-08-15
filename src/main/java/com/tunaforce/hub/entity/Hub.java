@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -12,8 +13,9 @@ import lombok.NoArgsConstructor;
 public class Hub {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long hubId;
+    @GeneratedValue
+    @Column(columnDefinition = "uuid", nullable = false, updatable = false)
+    private UUID hubId;
 
     @Column(nullable = false)
     private String hubName;
