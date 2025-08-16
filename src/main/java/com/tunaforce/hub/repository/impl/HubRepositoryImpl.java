@@ -1,7 +1,8 @@
-package com.tunaforce.hub.common.repository;
+package com.tunaforce.hub.repository.impl;
 
 import com.tunaforce.hub.entity.Hub;
-import com.tunaforce.hub.repository.jpa.HubRepository;
+import com.tunaforce.hub.repository.HubRepository;
+import com.tunaforce.hub.repository.jpa.JpaHubRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +16,10 @@ public class HubRepositoryImpl implements HubRepository {
     public Hub save(Hub hub) {
         return jpaHubRepository.save(hub);
     }
+
+    @Override
+    public boolean existsByHubName(String hubName) {
+        return jpaHubRepository.existsByHubName(hubName);
+    }
+
 }
