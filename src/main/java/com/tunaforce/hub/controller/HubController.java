@@ -6,6 +6,7 @@ import com.tunaforce.hub.service.HubService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ public class HubController {
 
     /*허브 생성 API*/
     @PostMapping
-    public ResponseEntity<HubCreateResponseDto> createHub(@RequestBody HubCreateRequestDto hubCreateRequestDto) {
+    public ResponseEntity<HubCreateResponseDto> createHub(@Validated @RequestBody HubCreateRequestDto hubCreateRequestDto) {
         return new ResponseEntity<>(hubService.createHub(hubCreateRequestDto), HttpStatus.CREATED);
     }
 }
