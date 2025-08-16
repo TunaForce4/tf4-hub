@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class HubService {
     private final HubRepository hubRepository;
+    private final NaverMapsService naverMapsService;
 
     @Transactional
     public HubCreateResponseDto createHub(HubCreateRequestDto requestDto) {
@@ -22,8 +23,8 @@ public class HubService {
         Hub hub = Hub.builder()
                 .hubName(requestDto.hubName())
                 .hubAddress(requestDto.hubAddress())
-                .hubLatitude(null)
-                .hubLongitude(null)
+                .hubLatitude(naverMapsService.getLatitude(requestDto.hubAddress()))
+                .hubLongitude(naverMapsService.getLongitude(requestDto.hubAddress()))
                 .build();
 
         Hub savedHub = hubRepository.save(hub);
