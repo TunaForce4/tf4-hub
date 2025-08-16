@@ -14,20 +14,23 @@ public class Hub {
 
     @Id
     @GeneratedValue
-    @Column(columnDefinition = "uuid", nullable = false, updatable = false)
+    @Column(name = "hub_id", columnDefinition = "uuid", nullable = false, updatable = false)
     private UUID hubId;
 
-    @Column(nullable = false)
+    @Column(name = "hub_name", nullable = false)
     private String hubName;
 
-    @Column(nullable = false)
+    @Column(name = "hub_address", nullable = false)
     private String hubAddress;
 
+    @Column(name = "hub_latitude")
     private Double hubLatitude;
 
+    @Column(name = "hub_longitude")
     private Double hubLongitude;
 
-    private Long hubAdminId;
+    @Column(name = "hub_admin_id")
+    private UUID hubAdminId;
 
     @Builder
     public Hub(String hubName, String hubAddress, Double hubLatitude, Double hubLongitude) {
@@ -37,7 +40,14 @@ public class Hub {
         this.hubLongitude = hubLongitude;
     }
 
-    public void setHubAdminId(Long hubAdminId) {
+    public void update(String hubName, String hubAddress, Double hubLatitude, Double hubLongitude) {
+        this.hubName = hubName;
+        this.hubAddress = hubAddress;
+        this.hubLatitude = hubLatitude;
+        this.hubLongitude = hubLongitude;
+    }
+
+    public void setHubAdminId(UUID hubAdminId) {
         this.hubAdminId = hubAdminId;
     }
 }
