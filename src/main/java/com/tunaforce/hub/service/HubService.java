@@ -11,6 +11,9 @@ import com.tunaforce.hub.dto.response.HubUpdateResponseDto;
 import com.tunaforce.hub.entity.Hub;
 import com.tunaforce.hub.repository.HubRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -45,6 +49,7 @@ public class HubService {
     }
 
     @Transactional
+    @CacheEvict(value = "hub", allEntries = true)
     public HubUpdateResponseDto updateHub(UUID hubId, HubUpdateRequestDto requestDto) {
         Hub hub = readHub(hubId);   // 기존 허브 조회
 
@@ -70,6 +75,7 @@ public class HubService {
     }
 
     @Transactional
+    @CacheEvict(value = "hub", allEntries = true)
     public HubDeleteResponseDto deleteHub(UUID hubId) {
         Hub hub = readHub(hubId);   // 기존 허브 조회
 
@@ -80,7 +86,10 @@ public class HubService {
         return new HubDeleteResponseDto(true);
     }
 
+    @Cacheable(value = "hub", key = "#hubId")
     public HubGetResponseDto getHub(UUID hubId) {
+        log.info("캐시되지 않은 허브 조회: {}", hubId);
+
         Hub hub = readHub(hubId);   // 기존 허브 조회
 
         return new HubGetResponseDto(hub.getHubId(), hub.getHubName(), hub.getHubAddress(),

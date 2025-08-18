@@ -47,6 +47,7 @@ public class HubController {
         return new ResponseEntity<>(hubService.getHub(hubId), HttpStatus.OK);
     }
 
+    /*허브 목록 조회 API*/
     @GetMapping
     public ResponseEntity<List<HubGetResponseDto>> getHubList(@RequestParam(defaultValue = "0") int page,
                                                               @RequestParam(defaultValue = "10") int size) {
