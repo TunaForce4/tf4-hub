@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.util.UUID;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @Table(name = "p_hub")
-public class Hub {
+public class Hub extends Timestamped {
 
     @Id
     @GeneratedValue
@@ -32,6 +33,9 @@ public class Hub {
     @Column(name = "hub_admin_id")
     private UUID hubAdminId;
 
+    @Column(name = "comment")
+    private String comment;
+
     @Builder
     public Hub(String hubName, String hubAddress, Double hubLatitude, Double hubLongitude) {
         this.hubName = hubName;
@@ -40,11 +44,12 @@ public class Hub {
         this.hubLongitude = hubLongitude;
     }
 
-    public void update(String hubName, String hubAddress, Double hubLatitude, Double hubLongitude) {
+    public void update(String hubName, String hubAddress, Double hubLatitude, Double hubLongitude, String comment) {
         this.hubName = hubName;
         this.hubAddress = hubAddress;
         this.hubLatitude = hubLatitude;
         this.hubLongitude = hubLongitude;
+        this.comment = comment;
     }
 
     public void setHubAdminId(UUID hubAdminId) {

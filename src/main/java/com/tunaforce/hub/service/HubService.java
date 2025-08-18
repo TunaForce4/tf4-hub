@@ -3,12 +3,16 @@ package com.tunaforce.hub.service;
 import com.tunaforce.hub.common.exception.ApplicationException;
 import com.tunaforce.hub.common.exception.HubException;
 import com.tunaforce.hub.dto.request.HubCreateRequestDto;
+import com.tunaforce.hub.dto.request.HubUpdateRequestDto;
 import com.tunaforce.hub.dto.response.HubCreateResponseDto;
+import com.tunaforce.hub.dto.response.HubUpdateResponseDto;
 import com.tunaforce.hub.entity.Hub;
 import com.tunaforce.hub.repository.HubRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +25,7 @@ public class HubService {
     public HubCreateResponseDto createHub(HubCreateRequestDto requestDto) {
         checkDuplicateHubName(requestDto.hubName());    //허브 이름 중복 검증
 
-        /* 위도, 경도는 외부 API 호출로 설정, 추후 수정 필요 */
+        /* 위도, 경도는 외부 API 호출로 설정 */
         Hub hub = Hub.builder()
                 .hubName(requestDto.hubName())
                 .hubAddress(requestDto.hubAddress())
@@ -32,6 +36,33 @@ public class HubService {
         Hub savedHub = hubRepository.save(hub);
 
         return new HubCreateResponseDto(savedHub.getHubId());
+    }
+
+    @Transactional
+    public HubUpdateResponseDto updateHub(UUID hubId, HubUpdateRequestDto requestDto) {
+        // 기존 허브 조회
+        Hub hub = hubRepository.findById(hubId)
+                .orElseThrow(() -> new ApplicationException(HubException.HUB_NOT_FOUND));
+
+        // 변경 사항이 없는 경우 BAD REQUEST 응답
+        if(hub.getHubName().equals(requestDto.hubName()) && hub.getHubAddress().equals(requestDto.hubAddress())) {
+            throw new ApplicationException(HubException.HUB_NO_CHANGE);
+        }
+
+        // 이름이 기존 이름과 다를 때만 중복 검증
+        if(!hub.getHubName().equals(requestDto.hubName())) {
+            checkDuplicateHubName(requestDto.hubName());
+        }
+
+        // 허브 업데이트
+        hub.update(requestDto.hubName(),
+                requestDto.hubAddress(),
+                naverMapsService.getLatitude(requestDto.hubAddress()),
+                naverMapsService.getLongitude(requestDto.hubAddress()),
+                requestDto.comment());
+
+        return new HubUpdateResponseDto(hub.getHubId());
+
     }
 
     /* 허브 이름 중복 확인 메서드 */

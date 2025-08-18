@@ -6,6 +6,9 @@ import com.tunaforce.hub.repository.jpa.JpaHubRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Repository
 @RequiredArgsConstructor
 public class HubRepositoryImpl implements HubRepository {
@@ -15,6 +18,11 @@ public class HubRepositoryImpl implements HubRepository {
     @Override
     public Hub save(Hub hub) {
         return jpaHubRepository.save(hub);
+    }
+
+    @Override
+    public Optional<Hub> findById(UUID hubId) {
+        return jpaHubRepository.findById(hubId);
     }
 
     @Override
