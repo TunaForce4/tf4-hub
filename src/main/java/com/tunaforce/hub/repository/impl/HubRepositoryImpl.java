@@ -4,8 +4,10 @@ import com.tunaforce.hub.entity.Hub;
 import com.tunaforce.hub.repository.HubRepository;
 import com.tunaforce.hub.repository.jpa.JpaHubRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,6 +30,11 @@ public class HubRepositoryImpl implements HubRepository {
     @Override
     public boolean existsByHubName(String hubName) {
         return jpaHubRepository.existsByHubName(hubName);
+    }
+
+    @Override
+    public List<Hub> findAll(Pageable pageable) {
+        return jpaHubRepository.findAll(pageable).getContent();
     }
 
 }

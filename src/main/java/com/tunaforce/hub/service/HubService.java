@@ -6,13 +6,18 @@ import com.tunaforce.hub.dto.request.HubCreateRequestDto;
 import com.tunaforce.hub.dto.request.HubUpdateRequestDto;
 import com.tunaforce.hub.dto.response.HubCreateResponseDto;
 import com.tunaforce.hub.dto.response.HubDeleteResponseDto;
+import com.tunaforce.hub.dto.response.HubGetResponseDto;
 import com.tunaforce.hub.dto.response.HubUpdateResponseDto;
 import com.tunaforce.hub.entity.Hub;
 import com.tunaforce.hub.repository.HubRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -41,9 +46,7 @@ public class HubService {
 
     @Transactional
     public HubUpdateResponseDto updateHub(UUID hubId, HubUpdateRequestDto requestDto) {
-        // 기존 허브 조회
-        Hub hub = hubRepository.findById(hubId)
-                .orElseThrow(() -> new ApplicationException(HubException.HUB_NOT_FOUND));
+        Hub hub = readHub(hubId);   // 기존 허브 조회
 
         // 변경 사항이 없는 경우 BAD REQUEST 응답
         if(hub.getHubName().equals(requestDto.hubName()) && hub.getHubAddress().equals(requestDto.hubAddress())) {
@@ -68,9 +71,7 @@ public class HubService {
 
     @Transactional
     public HubDeleteResponseDto deleteHub(UUID hubId) {
-        // 기존 허브 조회
-        Hub hub = hubRepository.findById(hubId)
-                .orElseThrow(() -> new ApplicationException(HubException.HUB_NOT_FOUND));
+        Hub hub = readHub(hubId);   // 기존 허브 조회
 
         /*Feign 호출로 현재 사용자 ID 가져오기*/
         /*임시로 랜덤 UUID 넣어줌, 추후 수정 필요*/
@@ -79,10 +80,41 @@ public class HubService {
         return new HubDeleteResponseDto(true);
     }
 
+    public HubGetResponseDto getHub(UUID hubId) {
+        Hub hub = readHub(hubId);   // 기존 허브 조회
+
+        return new HubGetResponseDto(hub.getHubId(), hub.getHubName(), hub.getHubAddress(),
+                hub.getHubLatitude(), hub.getHubLongitude());
+    }
+
+    public List<HubGetResponseDto> getHubList(int page, int size) {
+        if(page < 0 || size <= 0) {
+            throw new ApplicationException(HubException.INVALID_PAGE_OR_SIZE);
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+        List<Hub> hubs = hubRepository.findAll(pageable);
+
+        return hubs.stream()
+                .map(hub -> new HubGetResponseDto(
+                        hub.getHubId(),
+                        hub.getHubName(),
+                        hub.getHubAddress(),
+                        hub.getHubLatitude(),
+                        hub.getHubLongitude()))
+                .toList();
+    }
+
     /* 허브 이름 중복 확인 메서드 */
     private void checkDuplicateHubName(String hubName) {
         if(hubRepository.existsByHubName(hubName)){
             throw new ApplicationException(HubException.HUB_NAME_DUPLICATE);
         }
+    }
+
+    /*ID로 허브 조회 메서드*/
+    private Hub readHub(UUID hubId) {
+        return hubRepository.findById(hubId)
+                .orElseThrow(() -> new ApplicationException(HubException.HUB_NOT_FOUND));
     }
 }
