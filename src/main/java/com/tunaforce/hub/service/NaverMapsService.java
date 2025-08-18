@@ -1,6 +1,8 @@
 package com.tunaforce.hub.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.tunaforce.hub.common.exception.ApplicationException;
+import com.tunaforce.hub.common.exception.HubException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -33,7 +35,7 @@ public class NaverMapsService {
                 .block();
 
         if (response == null || response.get("addresses").isEmpty()) {
-            throw new IllegalArgumentException("유효하지 않은 주소입니다. ");
+            throw new ApplicationException(HubException.INVALID_HUB_ADDRESS);
         }
 
         JsonNode addresses = response.get("addresses").get(0);

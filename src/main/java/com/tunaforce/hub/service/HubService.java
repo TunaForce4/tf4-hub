@@ -1,5 +1,7 @@
 package com.tunaforce.hub.service;
 
+import com.tunaforce.hub.common.exception.ApplicationException;
+import com.tunaforce.hub.common.exception.HubException;
 import com.tunaforce.hub.dto.request.HubCreateRequestDto;
 import com.tunaforce.hub.dto.response.HubCreateResponseDto;
 import com.tunaforce.hub.entity.Hub;
@@ -35,7 +37,7 @@ public class HubService {
     /* 허브 이름 중복 확인 메서드 */
     private void checkDuplicateHubName(String hubName) {
         if(hubRepository.existsByHubName(hubName)){
-            throw new IllegalArgumentException("이미 동일한 허브명이 존재합니다.");
+            throw new ApplicationException(HubException.HUB_NAME_DUPLICATE);
         }
     }
 }
