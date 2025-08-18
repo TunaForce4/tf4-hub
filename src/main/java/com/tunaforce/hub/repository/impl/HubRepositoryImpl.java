@@ -24,17 +24,17 @@ public class HubRepositoryImpl implements HubRepository {
 
     @Override
     public Optional<Hub> findById(UUID hubId) {
-        return jpaHubRepository.findById(hubId);
+        return jpaHubRepository.findByHubIdAndDeletedAtIsNull(hubId);
     }
 
     @Override
     public boolean existsByHubName(String hubName) {
-        return jpaHubRepository.existsByHubName(hubName);
+        return jpaHubRepository.existsByHubNameAndDeletedAtIsNull(hubName);
     }
 
     @Override
     public List<Hub> findAll(Pageable pageable) {
-        return jpaHubRepository.findAll(pageable).getContent();
+        return jpaHubRepository.findAllByDeletedAtIsNull(pageable);
     }
 
 }
