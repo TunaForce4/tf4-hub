@@ -3,6 +3,7 @@ package com.tunaforce.hub.controller;
 import com.tunaforce.hub.dto.request.HubCreateRequestDto;
 import com.tunaforce.hub.dto.request.HubUpdateRequestDto;
 import com.tunaforce.hub.dto.response.HubCreateResponseDto;
+import com.tunaforce.hub.dto.response.HubDeleteResponseDto;
 import com.tunaforce.hub.dto.response.HubUpdateResponseDto;
 import com.tunaforce.hub.service.HubService;
 import lombok.RequiredArgsConstructor;
@@ -31,4 +32,11 @@ public class HubController {
                                                           @Validated @RequestBody HubUpdateRequestDto requestDto) {
         return new ResponseEntity<>(hubService.updateHub(hubId, requestDto), HttpStatus.OK);
     }
+
+    /*허브 삭제 API*/
+    @DeleteMapping("/{hubId}")
+    public ResponseEntity<HubDeleteResponseDto> deleteHub(@PathVariable UUID hubId) {
+        return new ResponseEntity<>(hubService.deleteHub(hubId), HttpStatus.OK);
+    }
+
 }

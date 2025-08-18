@@ -5,6 +5,7 @@ import com.tunaforce.hub.common.exception.HubException;
 import com.tunaforce.hub.dto.request.HubCreateRequestDto;
 import com.tunaforce.hub.dto.request.HubUpdateRequestDto;
 import com.tunaforce.hub.dto.response.HubCreateResponseDto;
+import com.tunaforce.hub.dto.response.HubDeleteResponseDto;
 import com.tunaforce.hub.dto.response.HubUpdateResponseDto;
 import com.tunaforce.hub.entity.Hub;
 import com.tunaforce.hub.repository.HubRepository;
@@ -23,9 +24,10 @@ public class HubService {
 
     @Transactional
     public HubCreateResponseDto createHub(HubCreateRequestDto requestDto) {
-        checkDuplicateHubName(requestDto.hubName());    //허브 이름 중복 검증
+        //허브 이름 중복 검증
+        checkDuplicateHubName(requestDto.hubName());
 
-        /* 위도, 경도는 외부 API 호출로 설정 */
+        // 위도, 경도는 외부 API 호출로 설정
         Hub hub = Hub.builder()
                 .hubName(requestDto.hubName())
                 .hubAddress(requestDto.hubAddress())
@@ -34,7 +36,6 @@ public class HubService {
                 .build();
 
         Hub savedHub = hubRepository.save(hub);
-
         return new HubCreateResponseDto(savedHub.getHubId());
     }
 
@@ -63,6 +64,19 @@ public class HubService {
 
         return new HubUpdateResponseDto(hub.getHubId());
 
+    }
+
+    @Transactional
+    public HubDeleteResponseDto deleteHub(UUID hubId) {
+        // 기존 허브 조회
+        Hub hub = hubRepository.findById(hubId)
+                .orElseThrow(() -> new ApplicationException(HubException.HUB_NOT_FOUND));
+
+        /*Feign 호출로 현재 사용자 ID 가져오기*/
+        /*임시로 랜덤 UUID 넣어줌, 추후 수정 필요*/
+        UUID userId = UUID.randomUUID();
+        hub.delete(userId);
+        return new HubDeleteResponseDto(true);
     }
 
     /* 허브 이름 중복 확인 메서드 */
