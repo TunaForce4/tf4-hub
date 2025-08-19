@@ -50,6 +50,6 @@ public class HubRouteService {
                 .distance(distance)
                 .build();
 
-        HubRoute savedHubRoute = hubRouteRepository.save(hubRoute);
+        hubRouteRepository.save(hubRoute);
     }
 }

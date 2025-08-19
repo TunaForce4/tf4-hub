@@ -16,7 +16,7 @@ public class NaverMapsConfig {
 
     // Geocoding API (주소 기반 위도, 경도 검색)
     @Bean
-    public WebClient naverGeocodingClient(WebClient.Builder webClientBuilder) {
+    public WebClient naverGeocodingClient() {
         return WebClient.builder()
                 .baseUrl("https://maps.apigw.ntruss.com/map-geocode/v2/geocode")
                 .defaultHeader("x-ncp-apigw-api-key-id", clientId)
@@ -26,7 +26,7 @@ public class NaverMapsConfig {
 
     // Directions5 API (최적 경로 검색)
     @Bean
-    public WebClient naverDirectionsClient(WebClient.Builder webClientBuilder) {
+    public WebClient naverDirectionsClient() {
         return WebClient.builder()
                 .baseUrl("https://maps.apigw.ntruss.com/map-direction/v1")
                 .defaultHeader("x-ncp-apigw-api-key-id", clientId)

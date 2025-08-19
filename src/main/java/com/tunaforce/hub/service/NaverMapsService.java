@@ -103,7 +103,7 @@ public class NaverMapsService {
             String selectedOption = null;
 
             for (String option : routeOptions) {
-                if (routeNode.has(option) && routeNode.get(option).isArray() && routeNode.get(option).size() > 0) {
+                if (routeNode.has(option) && routeNode.get(option).isArray() && !routeNode.get(option).isEmpty()) {
                     selectedRoute = routeNode.get(option);
                     selectedOption = option;
                     log.info("경로 옵션 '{}' 사용 가능", option);
