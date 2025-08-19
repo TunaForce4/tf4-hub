@@ -19,24 +19,24 @@ public class HubRoute extends Timestamped{
     private UUID hubRouteId;
 
     @Column(name = "origin_hub_id", nullable = false)
-    private UUID OriginHubId;
+    private UUID originHubId;
 
     @Column(name = "destination_hub_id", nullable = false)
-    private UUID DestinationHubId;
+    private UUID destinationHubId;
 
     @Column(name = "transit_time", nullable = false)
-    private Long transitTime;
+    private Long transitTime;       // Second
 
     @Column(name = "distance", nullable = false)
-    private Double distance;
+    private Double distance;        // Kilometer
 
     @Column(name = "comment")
     private String comment;
 
     @Builder
     public HubRoute(UUID originHubId, UUID destinationHubId, Long transitTime, Double distance) {
-        this.OriginHubId = originHubId;
-        this.DestinationHubId = destinationHubId;
+        this.originHubId = originHubId;
+        this.destinationHubId = destinationHubId;
         this.transitTime = transitTime;
         this.distance = distance;
     }

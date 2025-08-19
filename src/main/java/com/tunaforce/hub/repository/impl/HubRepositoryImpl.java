@@ -37,4 +37,10 @@ public class HubRepositoryImpl implements HubRepository {
         return jpaHubRepository.findAllByDeletedAtIsNull(pageable);
     }
 
+    @Override
+    public List<Hub> findAllByHubIdNot(UUID hubId) {
+        return jpaHubRepository.findAllByHubIdNot(hubId);
+    }
+
+
 }
