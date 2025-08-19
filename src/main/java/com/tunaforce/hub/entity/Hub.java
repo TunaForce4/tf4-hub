@@ -24,10 +24,10 @@ public class Hub extends Timestamped {
     @Column(name = "hub_address", nullable = false)
     private String hubAddress;
 
-    @Column(name = "hub_latitude")
+    @Column(name = "hub_latitude", nullable = false)
     private Double hubLatitude;
 
-    @Column(name = "hub_longitude")
+    @Column(name = "hub_longitude", nullable = false)
     private Double hubLongitude;
 
     @Column(name = "hub_admin_id")
