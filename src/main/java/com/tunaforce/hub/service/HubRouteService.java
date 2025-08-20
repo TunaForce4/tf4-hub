@@ -10,6 +10,8 @@ import com.tunaforce.hub.repository.HubRepository;
 import com.tunaforce.hub.repository.HubRouteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +28,10 @@ public class HubRouteService {
     private final HubRepository hubRepository;
     private final NaverMapsService naverMapsService;
 
+    @Cacheable(value = "hubRoute", key = "#from + '-' + #to")
     @Transactional
     public HubRouteGetResponseDto getHubRoute(UUID from, UUID to) {
+        log.info(" 캐시되지 않은 허브 경로 조회!!!");
         HubRoute hubRoute = hubRouteRepository.findByHubId(from, to)
                 .orElseThrow(()-> new ApplicationException(HubException.HUB_ROUTE_NOT_FOUND));
 
@@ -41,6 +45,7 @@ public class HubRouteService {
     }
 
     @Transactional
+    @CacheEvict(value = "hubRoute", allEntries = true)
     public HubRouteGetResponseDto updateOneHubRoute(UUID hubRouteId, HubRouteUpdateRequestDto requestDto) {
         HubRoute hubRoute = hubRouteRepository.findByHubRouteId(hubRouteId)
                 .orElseThrow(()-> new ApplicationException(HubException.HUB_ROUTE_NOT_FOUND));
@@ -78,6 +83,7 @@ public class HubRouteService {
     }
 
     @Transactional
+    @CacheEvict(value = "hubRoute", allEntries = true)
     public void updateHubRoutesAutomatically(Hub newHub){
         // newHub를 제외한 기존 허브 모두 조회
         List<Hub> hubList = hubRepository.findAllByHubIdNot(newHub.getHubId());
@@ -94,6 +100,7 @@ public class HubRouteService {
     }
 
     @Transactional
+    @CacheEvict(value = "hubRoute", allEntries = true)
     public void deleteHubRoutesAutomatically(Hub newHub){
         // newHub를 제외한 기존 허브 모두 조회
         List<Hub> hubList = hubRepository.findAllByHubIdNot(newHub.getHubId());
