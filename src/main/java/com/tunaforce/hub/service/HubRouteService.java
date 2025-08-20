@@ -2,6 +2,7 @@ package com.tunaforce.hub.service;
 
 import com.tunaforce.hub.common.exception.ApplicationException;
 import com.tunaforce.hub.common.exception.HubException;
+import com.tunaforce.hub.dto.response.HubRouteGetResponseDto;
 import com.tunaforce.hub.entity.Hub;
 import com.tunaforce.hub.entity.HubRoute;
 import com.tunaforce.hub.repository.HubRepository;
@@ -23,6 +24,20 @@ public class HubRouteService {
     private final HubRouteRepository hubRouteRepository;
     private final HubRepository hubRepository;
     private final NaverMapsService naverMapsService;
+
+    @Transactional
+    public HubRouteGetResponseDto getHubRoute(UUID from, UUID to) {
+        HubRoute hubRoute = hubRouteRepository.findByHubId(from, to)
+                .orElseThrow(()-> new ApplicationException(HubException.HUB_ROUTE_NOT_FOUND));
+
+        String originHubName = hubRepository.findById(hubRoute.getOriginHubId())
+                .orElseThrow(()-> new ApplicationException(HubException.HUB_NOT_FOUND)).getHubName();
+        String destinationHubName = hubRepository.findById(hubRoute.getDestinationHubId())
+                .orElseThrow(()-> new ApplicationException(HubException.HUB_NOT_FOUND)).getHubName();
+
+        return new HubRouteGetResponseDto(hubRoute.getHubRouteId(),
+                originHubName, destinationHubName, hubRoute.getTransitTime(), hubRoute.getDistance());
+    }
 
     @Transactional
     public void createHubRoutesAutomatically(Hub newHub){
