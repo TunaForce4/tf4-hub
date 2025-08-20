@@ -5,6 +5,7 @@ import com.tunaforce.hub.repository.HubRepository;
 import com.tunaforce.hub.repository.jpa.JpaHubRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -40,6 +41,11 @@ public class HubRepositoryImpl implements HubRepository {
     @Override
     public List<Hub> findAllByHubIdNot(UUID hubId) {
         return jpaHubRepository.findAllByHubIdNotAndDeletedAtIsNull(hubId);
+    }
+
+    @Override
+    public List<Hub> findAll(Sort sort) {
+        return jpaHubRepository.findAllByDeletedAtIsNull(sort);
     }
 
 

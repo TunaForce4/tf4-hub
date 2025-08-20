@@ -119,13 +119,17 @@ public class HubService {
     }
 
     public List<HubGetResponseDto> getHubList(int page, int size) {
-        if(page < 0 || size <= 0) {
+        if(page < 0 || size < 0) {
             throw new ApplicationException(HubException.INVALID_PAGE_OR_SIZE);
         }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
-        List<Hub> hubs = hubRepository.findAll(pageable);
-
+        List<Hub> hubs;
+        if(size == 0){
+            hubs = hubRepository.findAll(Sort.by("createdAt").ascending());
+        } else{
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+            hubs = hubRepository.findAll(pageable);
+        }
         return hubs.stream()
                 .map(hub -> new HubGetResponseDto(
                         hub.getHubId(),
