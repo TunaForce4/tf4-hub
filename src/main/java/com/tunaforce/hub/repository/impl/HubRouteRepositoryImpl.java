@@ -25,4 +25,9 @@ public class HubRouteRepositoryImpl implements HubRouteRepository {
         return jpaHubRouteRepository.findByOriginHubIdAndDestinationHubIdAndDeletedAtIsNull(originHubId, destinationHubId);
     }
 
+    @Override
+    public Optional<HubRoute> findByHubRouteId(UUID hubRouteId) {
+        return jpaHubRouteRepository.findByHubRouteIdAndDeletedAtIsNull(hubRouteId);
+    }
+
 }

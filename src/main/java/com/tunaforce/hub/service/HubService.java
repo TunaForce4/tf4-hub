@@ -85,8 +85,8 @@ public class HubService {
                 longitude,
                 requestDto.comment());
 
-        // 허브 경로 서비스 호출, 허브 간 이동 경로 자동 생성
-        hubRouteService.createHubRoutesAutomatically(hub);
+        // 허브 경로 서비스 호출, 허브 간 이동 경로 자동 업데이트
+        hubRouteService.updateHubRoutesAutomatically(hub);
 
         return new HubUpdateResponseDto(hub.getHubId());
 
@@ -101,6 +101,10 @@ public class HubService {
         /*임시로 랜덤 UUID 넣어줌, 추후 수정 필요*/
         UUID userId = UUID.randomUUID();
         hub.delete(userId);
+
+        // 허브 경로 서비스 호출, 허브 간 이동 경로 자동 삭제
+        hubRouteService.deleteHubRoutesAutomatically(hub);
+
         return new HubDeleteResponseDto(true);
     }
 
@@ -115,13 +119,17 @@ public class HubService {
     }
 
     public List<HubGetResponseDto> getHubList(int page, int size) {
-        if(page < 0 || size <= 0) {
+        if(page < 0 || size < 0) {
             throw new ApplicationException(HubException.INVALID_PAGE_OR_SIZE);
         }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
-        List<Hub> hubs = hubRepository.findAll(pageable);
-
+        List<Hub> hubs;
+        if(size == 0){
+            hubs = hubRepository.findAll(Sort.by("createdAt").ascending());
+        } else{
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+            hubs = hubRepository.findAll(pageable);
+        }
         return hubs.stream()
                 .map(hub -> new HubGetResponseDto(
                         hub.getHubId(),

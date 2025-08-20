@@ -8,5 +8,6 @@ import java.util.UUID;
 
 public interface JpaHubRouteRepository extends JpaRepository<HubRoute, UUID> {
     Optional<HubRoute> findByOriginHubIdAndDestinationHubIdAndDeletedAtIsNull(UUID originHubId, UUID destinationHubId);
+    Optional<HubRoute> findByHubRouteIdAndDeletedAtIsNull(UUID hubRouteId);
 }
 
