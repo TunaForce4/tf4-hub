@@ -101,6 +101,10 @@ public class HubService {
         /*임시로 랜덤 UUID 넣어줌, 추후 수정 필요*/
         UUID userId = UUID.randomUUID();
         hub.delete(userId);
+
+        // 허브 경로 서비스 호출, 허브 간 이동 경로 자동 삭제
+        hubRouteService.deleteHubRoutesAutomatically(hub);
+
         return new HubDeleteResponseDto(true);
     }
 
