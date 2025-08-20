@@ -20,8 +20,8 @@ public enum HubException {
     HUB_ROUTE_NOT_FOUND(HttpStatus.NOT_FOUND, "허브 간 이동 경로를 찾을 수 없습니다."),
 
     // Auth
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저 정보를 찾을 수 없습니다."),
-    INVALID_REQUESTED_COMPANY_OR_HUB(HttpStatus.BAD_REQUEST, "요청한 허브 또는 업체가 유효하지 않습니다."),
     AUTH_SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "서비스가 동작하지 않습니다.");
 
     private final HttpStatus status;
