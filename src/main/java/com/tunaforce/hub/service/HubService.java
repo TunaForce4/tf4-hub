@@ -85,8 +85,8 @@ public class HubService {
                 longitude,
                 requestDto.comment());
 
-        // 허브 경로 서비스 호출, 허브 간 이동 경로 자동 생성
-        hubRouteService.createHubRoutesAutomatically(hub);
+        // 허브 경로 서비스 호출, 허브 간 이동 경로 자동 업데이트
+        hubRouteService.updateHubRoutesAutomatically(hub);
 
         return new HubUpdateResponseDto(hub.getHubId());
 

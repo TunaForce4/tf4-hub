@@ -1,5 +1,7 @@
 package com.tunaforce.hub.service;
 
+import com.tunaforce.hub.common.exception.ApplicationException;
+import com.tunaforce.hub.common.exception.HubException;
 import com.tunaforce.hub.entity.Hub;
 import com.tunaforce.hub.entity.HubRoute;
 import com.tunaforce.hub.repository.HubRepository;
@@ -37,6 +39,23 @@ public class HubRouteService {
         }
     }
 
+    @Transactional
+    public void updateHubRoutesAutomatically(Hub newHub){
+        // newHub를 제외한 기존 허브 모두 조회
+        List<Hub> hubList = hubRepository.findAllByHubIdNot(newHub.getHubId());
+
+        // newHub를 출발지로 설정, 모든 허브와의 경로 업데이트
+        for(Hub goalHub : hubList){
+            updateHubRoute(newHub, goalHub);
+        }
+
+        // newHub를 도착지로 설정, 모든 허브와의 경로 업데이트
+        for(Hub startHub : hubList){
+            updateHubRoute(startHub, newHub);
+        }
+    }
+
+    /*출발허브, 도착허브 인스턴스를 매개변수로 받아서 허브 경로 생성 */
     private void createHubRoute(Hub startHub, Hub goalHub){
         // Naver Maps API 호출하여 이동 거리와 시간 검색
         Map<String, Number> directions = naverMapsService.getDirections(startHub, goalHub);
@@ -51,5 +70,19 @@ public class HubRouteService {
                 .build();
 
         hubRouteRepository.save(hubRoute);
+    }
+
+    /*출발허브, 도착허브 인스턴스를 매개변수로 받아서 허브 경로 업데이트 */
+    private void updateHubRoute(Hub startHub, Hub goalHub){
+        // Naver Maps API 호출하여 이동 거리와 시간 검색
+        Map<String, Number> directions = naverMapsService.getDirections(startHub, goalHub);
+        Double distance = directions.get("distance").doubleValue();
+        Long transitTime = directions.get("transitTime").longValue();
+
+        HubRoute hubRoute = hubRouteRepository.findByHubId(startHub.getHubId(), goalHub.getHubId())
+                .orElseThrow(()-> new ApplicationException(HubException.HUB_ROUTE_NOT_FOUND));
+
+        //허브 경로 업데이트
+        hubRoute.update(transitTime, distance, "허브 정보 변경");
     }
 }

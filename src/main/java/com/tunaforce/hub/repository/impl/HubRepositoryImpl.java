@@ -39,7 +39,7 @@ public class HubRepositoryImpl implements HubRepository {
 
     @Override
     public List<Hub> findAllByHubIdNot(UUID hubId) {
-        return jpaHubRepository.findAllByHubIdNot(hubId);
+        return jpaHubRepository.findAllByHubIdNotAndDeletedAtIsNull(hubId);
     }
 
 
