@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -30,21 +31,30 @@ import java.util.UUID;
 public class HubService {
     private final HubRepository hubRepository;
     private final NaverMapsService naverMapsService;
+    private final HubRouteService hubRouteService;
 
     @Transactional
     public HubCreateResponseDto createHub(HubCreateRequestDto requestDto) {
         //허브 이름 중복 검증
         checkDuplicateHubName(requestDto.hubName());
 
-        // 위도, 경도는 외부 API 호출로 설정
+        // 위도, 경도는 네이버 지도 API 호출로 설정
+        Map<String, Double> coordinates = naverMapsService.getCoordinates(requestDto.hubAddress());
+        Double latitude =   coordinates.get("latitude");
+        Double longitude =   coordinates.get("longitude");
+
         Hub hub = Hub.builder()
                 .hubName(requestDto.hubName())
                 .hubAddress(requestDto.hubAddress())
-                .hubLatitude(naverMapsService.getLatitude(requestDto.hubAddress()))
-                .hubLongitude(naverMapsService.getLongitude(requestDto.hubAddress()))
+                .hubLatitude(latitude)
+                .hubLongitude(longitude)
                 .build();
 
         Hub savedHub = hubRepository.save(hub);
+
+        // 허브 경로 서비스 호출, 허브 간 이동 경로 자동 생성
+        hubRouteService.createHubRoutesAutomatically(savedHub);
+
         return new HubCreateResponseDto(savedHub.getHubId());
     }
 
@@ -63,12 +73,20 @@ public class HubService {
             checkDuplicateHubName(requestDto.hubName());
         }
 
+        // 위도, 경도는 네이버 지도 API 호출로 설정
+        Map<String, Double> coordinates = naverMapsService.getCoordinates(requestDto.hubAddress());
+        Double latitude =   coordinates.get("latitude");
+        Double longitude =   coordinates.get("longitude");
+
         // 허브 업데이트
         hub.update(requestDto.hubName(),
                 requestDto.hubAddress(),
-                naverMapsService.getLatitude(requestDto.hubAddress()),
-                naverMapsService.getLongitude(requestDto.hubAddress()),
+                latitude,
+                longitude,
                 requestDto.comment());
+
+        // 허브 경로 서비스 호출, 허브 간 이동 경로 자동 생성
+        hubRouteService.createHubRoutesAutomatically(hub);
 
         return new HubUpdateResponseDto(hub.getHubId());
 

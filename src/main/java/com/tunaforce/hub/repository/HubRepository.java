@@ -12,4 +12,5 @@ public interface HubRepository{
     Optional<Hub> findById(UUID hubId);
     boolean existsByHubName(String hubName);
     List<Hub> findAll(Pageable pageable);
+    List<Hub> findAllByHubIdNot(UUID hubId);
 }
