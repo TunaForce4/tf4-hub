@@ -24,21 +24,25 @@ public class HubController {
 
     /*허브 생성 API*/
     @PostMapping
-    public ResponseEntity<HubCreateResponseDto> createHub(@Validated @RequestBody HubCreateRequestDto requestDto) {
-        return new ResponseEntity<>(hubService.createHub(requestDto), HttpStatus.CREATED);
+    public ResponseEntity<HubCreateResponseDto> createHub(@RequestHeader("X-Roles") String roles,
+                                                          @Validated @RequestBody HubCreateRequestDto requestDto) {
+        return new ResponseEntity<>(hubService.createHub(roles, requestDto), HttpStatus.CREATED);
     }
 
     /*허브 수정 API*/
     @PutMapping("/{hubId}")
-    public ResponseEntity<HubUpdateResponseDto> updateHub(@PathVariable UUID hubId,
+    public ResponseEntity<HubUpdateResponseDto> updateHub(@RequestHeader("X-Roles") String roles,
+                                                          @PathVariable UUID hubId,
                                                           @Validated @RequestBody HubUpdateRequestDto requestDto) {
-        return new ResponseEntity<>(hubService.updateHub(hubId, requestDto), HttpStatus.OK);
+        return new ResponseEntity<>(hubService.updateHub(roles, hubId, requestDto), HttpStatus.OK);
     }
 
     /*허브 삭제 API*/
     @DeleteMapping("/{hubId}")
-    public ResponseEntity<HubDeleteResponseDto> deleteHub(@PathVariable UUID hubId) {
-        return new ResponseEntity<>(hubService.deleteHub(hubId), HttpStatus.OK);
+    public ResponseEntity<HubDeleteResponseDto> deleteHub(@RequestHeader("X-User-Id") String userId,
+                                                          @RequestHeader("X-Roles") String roles,
+                                                          @PathVariable UUID hubId) {
+        return new ResponseEntity<>(hubService.deleteHub(userId, roles, hubId), HttpStatus.OK);
     }
 
     /*허브 단건 조회 API*/

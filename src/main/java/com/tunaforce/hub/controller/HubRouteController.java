@@ -24,8 +24,9 @@ public class HubRouteController {
     }
 
     @PutMapping("/{hubRouteId}")
-    public ResponseEntity<HubRouteGetResponseDto> updateOneHubRoute(@PathVariable UUID hubRouteId,
+    public ResponseEntity<HubRouteGetResponseDto> updateOneHubRoute(@RequestHeader("X-Roles") String roles,
+                                                                    @PathVariable UUID hubRouteId,
                                                                     @Validated @RequestBody HubRouteUpdateRequestDto requestDto){
-        return new ResponseEntity<>(hubRouteService.updateOneHubRoute(hubRouteId, requestDto), HttpStatus.OK);
+        return new ResponseEntity<>(hubRouteService.updateOneHubRoute(roles, hubRouteId, requestDto), HttpStatus.OK);
     }
 }

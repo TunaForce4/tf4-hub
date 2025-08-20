@@ -34,7 +34,10 @@ public class HubService {
     private final HubRouteService hubRouteService;
 
     @Transactional
-    public HubCreateResponseDto createHub(HubCreateRequestDto requestDto) {
+    public HubCreateResponseDto createHub(String roles, HubCreateRequestDto requestDto) {
+        // 권한 확인
+        validateMasterRole(roles);
+
         //허브 이름 중복 검증
         checkDuplicateHubName(requestDto.hubName());
 
@@ -60,7 +63,10 @@ public class HubService {
 
     @Transactional
     @CacheEvict(value = "hub", allEntries = true)
-    public HubUpdateResponseDto updateHub(UUID hubId, HubUpdateRequestDto requestDto) {
+    public HubUpdateResponseDto updateHub(String roles, UUID hubId, HubUpdateRequestDto requestDto) {
+        // 권한 확인
+        validateMasterRole(roles);
+
         Hub hub = readHub(hubId);   // 기존 허브 조회
 
         // 변경 사항이 없는 경우 BAD REQUEST 응답
@@ -94,16 +100,18 @@ public class HubService {
 
     @Transactional
     @CacheEvict(value = "hub", allEntries = true)
-    public HubDeleteResponseDto deleteHub(UUID hubId) {
+    public HubDeleteResponseDto deleteHub(String userId, String roles, UUID hubId) {
+        // 권한 확인
+        validateMasterRole(roles);
+
         Hub hub = readHub(hubId);   // 기존 허브 조회
 
-        /*Feign 호출로 현재 사용자 ID 가져오기*/
-        /*임시로 랜덤 UUID 넣어줌, 추후 수정 필요*/
-        UUID userId = UUID.randomUUID();
-        hub.delete(userId);
+        // 현재 사용자 ID 넣어줌
+        UUID deletedAt = UUID.fromString(userId);
+        hub.delete(deletedAt);
 
         // 허브 경로 서비스 호출, 허브 간 이동 경로 자동 삭제
-        hubRouteService.deleteHubRoutesAutomatically(hub);
+        hubRouteService.deleteHubRoutesAutomatically(hub, UUID.fromString(userId));
 
         return new HubDeleteResponseDto(true);
     }
@@ -151,5 +159,12 @@ public class HubService {
     private Hub readHub(UUID hubId) {
         return hubRepository.findById(hubId)
                 .orElseThrow(() -> new ApplicationException(HubException.HUB_NOT_FOUND));
+    }
+
+    /* 권한 확인 메서드 (Master 인지 확인)*/
+    private void validateMasterRole(String roles) {
+        if (roles == null || !roles.contains("Master")) {
+            throw new ApplicationException(HubException.ACCESS_DENIED);
+        }
     }
 }

@@ -46,7 +46,10 @@ public class HubRouteService {
 
     @Transactional
     @CacheEvict(value = "hubRoute", allEntries = true)
-    public HubRouteGetResponseDto updateOneHubRoute(UUID hubRouteId, HubRouteUpdateRequestDto requestDto) {
+    public HubRouteGetResponseDto updateOneHubRoute(String roles, UUID hubRouteId, HubRouteUpdateRequestDto requestDto) {
+        // 권한 확인
+        validateMasterRole(roles);
+
         HubRoute hubRoute = hubRouteRepository.findByHubRouteId(hubRouteId)
                 .orElseThrow(()-> new ApplicationException(HubException.HUB_ROUTE_NOT_FOUND));
 
@@ -101,18 +104,18 @@ public class HubRouteService {
 
     @Transactional
     @CacheEvict(value = "hubRoute", allEntries = true)
-    public void deleteHubRoutesAutomatically(Hub newHub){
+    public void deleteHubRoutesAutomatically(Hub newHub, UUID userId){
         // newHub를 제외한 기존 허브 모두 조회
         List<Hub> hubList = hubRepository.findAllByHubIdNot(newHub.getHubId());
 
         // newHub를 출발지로 설정, 모든 허브와의 경로 삭제
         for(Hub goalHub : hubList){
-            deleteHubRoute(newHub, goalHub);
+            deleteHubRoute(newHub, goalHub, userId);
         }
 
         // newHub를 도착지로 설정, 모든 허브와의 경로 삭제
         for(Hub startHub : hubList){
-            deleteHubRoute(startHub, newHub);
+            deleteHubRoute(startHub, newHub, userId);
         }
     }
 
@@ -148,12 +151,17 @@ public class HubRouteService {
     }
 
     /*출발허브, 도착허브 인스턴스를 매개변수로 받아서 허브 경로 자동 삭제*/
-    private void deleteHubRoute(Hub startHub, Hub goalHub){
+    private void deleteHubRoute(Hub startHub, Hub goalHub, UUID userId){
         HubRoute hubRoute = hubRouteRepository.findByHubId(startHub.getHubId(), goalHub.getHubId())
                 .orElseThrow(()-> new ApplicationException(HubException.HUB_ROUTE_NOT_FOUND));
 
-        // 추후 수정 필요
-        UUID userId = UUID.randomUUID();
         hubRoute.delete(userId);
+    }
+
+    /* 권한 확인 메서드 (Master 인지 확인)*/
+    private void validateMasterRole(String roles) {
+        if (roles == null || !roles.contains("Master")) {
+            throw new ApplicationException(HubException.ACCESS_DENIED);
+        }
     }
 }
