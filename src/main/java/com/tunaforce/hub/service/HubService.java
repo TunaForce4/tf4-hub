@@ -4,10 +4,7 @@ import com.tunaforce.hub.common.exception.ApplicationException;
 import com.tunaforce.hub.common.exception.HubException;
 import com.tunaforce.hub.dto.request.HubCreateRequestDto;
 import com.tunaforce.hub.dto.request.HubUpdateRequestDto;
-import com.tunaforce.hub.dto.response.HubCreateResponseDto;
-import com.tunaforce.hub.dto.response.HubDeleteResponseDto;
-import com.tunaforce.hub.dto.response.HubGetResponseDto;
-import com.tunaforce.hub.dto.response.HubUpdateResponseDto;
+import com.tunaforce.hub.dto.response.*;
 import com.tunaforce.hub.entity.Hub;
 import com.tunaforce.hub.repository.HubRepository;
 import lombok.RequiredArgsConstructor;
@@ -166,5 +163,30 @@ public class HubService {
         if (roles == null || !roles.contains("Master")) {
             throw new ApplicationException(HubException.ACCESS_DENIED);
         }
+    }
+
+    /* 권한 확인 메서드 (Hub 인지 확인)*/
+    private void validateHubRole(String roles) {
+        if (roles == null || !roles.contains("Hub")) {
+            throw new ApplicationException(HubException.ACCESS_DENIED);
+        }
+    }
+
+    @Transactional
+    public AssignHubAdminResponseDto assignHubAdmin(String roles, UUID hubId, UUID hubAdminId) {
+        validateHubRole(roles);     //권한 확인
+
+        Hub hub = readHub(hubId);   // 기존 허브 조회
+        
+        hub.setHubAdminId(hubAdminId);
+        
+        return new AssignHubAdminResponseDto(hubId, hub.getHubName(), hubAdminId);
+    }
+
+    public GetHubByAdminResponseDto getHubByAdminId(UUID hubAdminId) {
+        Hub hub = hubRepository.findByHubAdminId(hubAdminId)
+                .orElseThrow(() -> new ApplicationException(HubException.HUB_NOT_FOUND));
+
+        return new GetHubByAdminResponseDto(hub.getHubId(), hub.getHubName());
     }
 }

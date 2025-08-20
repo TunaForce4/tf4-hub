@@ -15,4 +15,5 @@ public interface HubRepository{
     List<Hub> findAll(Pageable pageable);
     List<Hub> findAllByHubIdNot(UUID hubId);
     List<Hub> findAll(Sort sort);
+    Optional<Hub> findByHubAdminId(UUID hubAdminId);
 }

@@ -2,10 +2,7 @@ package com.tunaforce.hub.controller;
 
 import com.tunaforce.hub.dto.request.HubCreateRequestDto;
 import com.tunaforce.hub.dto.request.HubUpdateRequestDto;
-import com.tunaforce.hub.dto.response.HubCreateResponseDto;
-import com.tunaforce.hub.dto.response.HubDeleteResponseDto;
-import com.tunaforce.hub.dto.response.HubGetResponseDto;
-import com.tunaforce.hub.dto.response.HubUpdateResponseDto;
+import com.tunaforce.hub.dto.response.*;
 import com.tunaforce.hub.service.HubService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -56,6 +53,20 @@ public class HubController {
     public ResponseEntity<List<HubGetResponseDto>> getHubList(@RequestParam(defaultValue = "0") int page,
                                                               @RequestParam(defaultValue = "10") int size) {
         return new ResponseEntity<>(hubService.getHubList(page, size), HttpStatus.OK);
+    }
+
+    /*허브 관리자 등록 API*/
+    @PostMapping("/{hubId}/admins/{hubAdminId}")
+    public ResponseEntity<AssignHubAdminResponseDto> assignHubAdmin(@RequestHeader("X-Roles") String roles,
+                                                              @PathVariable UUID hubId,
+                                                              @PathVariable UUID hubAdminId) {
+        return new ResponseEntity<>(hubService.assignHubAdmin(roles, hubId, hubAdminId), HttpStatus.OK);
+    }
+
+    /*허브 관리자 조회 API*/
+    @GetMapping("/admins/{hubAdminId}")
+    public ResponseEntity<GetHubByAdminResponseDto> getHubByAdminId(@PathVariable UUID hubAdminId) {
+        return new ResponseEntity<>(hubService.getHubByAdminId(hubAdminId), HttpStatus.OK);
     }
 
 }

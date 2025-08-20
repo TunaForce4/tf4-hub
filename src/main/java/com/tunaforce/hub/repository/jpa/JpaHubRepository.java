@@ -15,4 +15,5 @@ public interface JpaHubRepository extends JpaRepository<Hub, UUID> {
     List<Hub> findAllByDeletedAtIsNull(Pageable pageable);
     List<Hub> findAllByDeletedAtIsNull(Sort sort);
     List<Hub> findAllByHubIdNotAndDeletedAtIsNull(UUID hubId);
+    Optional<Hub> findByHubAdminIdAndDeletedAtIsNull(UUID hubAdminId);
 }
