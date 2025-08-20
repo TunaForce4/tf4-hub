@@ -2,6 +2,7 @@ package com.tunaforce.hub.service;
 
 import com.tunaforce.hub.common.exception.ApplicationException;
 import com.tunaforce.hub.common.exception.HubException;
+import com.tunaforce.hub.dto.request.HubRouteUpdateRequestDto;
 import com.tunaforce.hub.dto.response.HubRouteGetResponseDto;
 import com.tunaforce.hub.entity.Hub;
 import com.tunaforce.hub.entity.HubRoute;
@@ -37,6 +38,27 @@ public class HubRouteService {
 
         return new HubRouteGetResponseDto(hubRoute.getHubRouteId(),
                 originHubName, destinationHubName, hubRoute.getTransitTime(), hubRoute.getDistance());
+    }
+
+    @Transactional
+    public HubRouteGetResponseDto updateOneHubRoute(UUID hubRouteId, HubRouteUpdateRequestDto requestDto) {
+        HubRoute hubRoute = hubRouteRepository.findByHubRouteId(hubRouteId)
+                .orElseThrow(()-> new ApplicationException(HubException.HUB_ROUTE_NOT_FOUND));
+
+        Hub originHub = hubRepository.findById(hubRoute.getOriginHubId())
+                .orElseThrow(()-> new ApplicationException(HubException.HUB_NOT_FOUND));
+        Hub destinationHub = hubRepository.findById(hubRoute.getDestinationHubId())
+                .orElseThrow(()-> new ApplicationException(HubException.HUB_NOT_FOUND));
+
+        // Naver Maps API 호출하여 이동 거리와 시간 검색
+        Map<String, Number> directions = naverMapsService.getDirections(originHub, destinationHub);
+        Double distance = directions.get("distance").doubleValue();
+        Long transitTime = directions.get("transitTime").longValue();
+
+        hubRoute.update(transitTime, distance, requestDto.comment());
+
+        return new HubRouteGetResponseDto(hubRoute.getHubRouteId(),
+                originHub.getHubName(), destinationHub.getHubName(), hubRoute.getTransitTime(), hubRoute.getDistance());
     }
 
     @Transactional
