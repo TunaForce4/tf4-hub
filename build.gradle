@@ -50,6 +50,10 @@ dependencyManagement {
 	}
 }
 
+springBoot {
+	mainClass = 'com.tunaforce.hub.HubServiceApplication'
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }

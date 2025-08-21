@@ -160,7 +160,7 @@ public class HubRouteService {
 
     /* 권한 확인 메서드 (Master 인지 확인)*/
     private void validateMasterRole(String roles) {
-        if (roles == null || !roles.contains("Master")) {
+        if (roles == null || !roles.contains("MASTER")) {
             throw new ApplicationException(HubException.ACCESS_DENIED);
         }
     }

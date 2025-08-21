@@ -160,14 +160,14 @@ public class HubService {
 
     /* 권한 확인 메서드 (Master 인지 확인)*/
     private void validateMasterRole(String roles) {
-        if (roles == null || !roles.contains("Master")) {
+        if (roles == null || !roles.contains("MASTER")) {
             throw new ApplicationException(HubException.ACCESS_DENIED);
         }
     }
 
     /* 권한 확인 메서드 (Hub 인지 확인)*/
     private void validateHubRole(String roles) {
-        if (roles == null || !roles.contains("Hub")) {
+        if (roles == null || !roles.contains("HUB")) {
             throw new ApplicationException(HubException.ACCESS_DENIED);
         }
     }
