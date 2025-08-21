@@ -1,5 +1,7 @@
 package com.tunaforce.hub.service;
 
+import com.tunaforce.hub.common.client.AuthClient;
+import com.tunaforce.hub.common.client.dto.UserInfoResponseDto;
 import com.tunaforce.hub.common.exception.ApplicationException;
 import com.tunaforce.hub.common.exception.HubException;
 import com.tunaforce.hub.dto.request.HubCreateRequestDto;
@@ -29,6 +31,7 @@ public class HubService {
     private final HubRepository hubRepository;
     private final NaverMapsService naverMapsService;
     private final HubRouteService hubRouteService;
+    private final AuthClient authClient;
 
     @Transactional
     public HubCreateResponseDto createHub(String roles, HubCreateRequestDto requestDto) {
@@ -174,7 +177,25 @@ public class HubService {
 
     @Transactional
     public AssignHubAdminResponseDto assignHubAdmin(String roles, UUID hubId, UUID hubAdminId) {
-        validateHubRole(roles);     //권한 확인
+        validateMasterRole(roles);     //요청한 사용자 권한 확인
+
+        UserInfoResponseDto userInfo;
+        try {
+            userInfo = authClient.getUserInfo(hubAdminId);
+        } catch (Exception e) {
+            // 유저 서비스가 죽었거나 응답 못 받을 때
+            throw new ApplicationException(HubException.AUTH_SERVICE_UNAVAILABLE);
+        }
+
+        if (userInfo == null) {
+            // 유저 정보를 못 받아왔을 때
+            throw new ApplicationException(HubException.USER_NOT_FOUND);
+        }
+
+        if (!"HUB".equals(userInfo.role())) {
+            // HUB 권한이 아닐 때
+            throw new ApplicationException(HubException.NOT_HUB_ADMIN);
+        }
 
         Hub hub = readHub(hubId);   // 기존 허브 조회
         

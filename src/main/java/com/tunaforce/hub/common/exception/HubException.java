@@ -21,6 +21,7 @@ public enum HubException {
 
     // Auth
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
+    NOT_HUB_ADMIN(HttpStatus.BAD_REQUEST, "허브 관리자 권한의 유저가 아니라서 관리자로 등록할 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저 정보를 찾을 수 없습니다."),
     AUTH_SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "서비스가 동작하지 않습니다.");
 
